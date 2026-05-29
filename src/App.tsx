@@ -40,6 +40,17 @@ export default function App() {
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [adminTab, setAdminTab] = useState<"dashboard" | "artigos" | "categorias" | "users" | "ads" | "mensagens" | "config">("dashboard");
 
+  // Admin authentication states
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState<boolean>(() => {
+    return sessionStorage.getItem("admin_authenticated") === "true";
+  });
+  const [adminPassword, setAdminPassword] = useState<string>(() => {
+    return localStorage.getItem("admin_portal_password") || "admin123";
+  });
+  const [loginPasswordInput, setLoginPasswordInput] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [loginError, setLoginError] = useState("");
+
   // Site Configuration
   const [siteConfig, setSiteConfig] = useState({
     name: "MOZINFORMATIVO",
@@ -119,6 +130,19 @@ export default function App() {
   const [adCodeTopo, setAdCodeTopo] = useState("");
   const [adCodeMeio, setAdCodeMeio] = useState("");
   const [adCodeRodape, setAdCodeRodape] = useState("");
+
+  // Login administrator validation
+  const handleAdminLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (loginPasswordInput === adminPassword) {
+      setIsAdminLoggedIn(true);
+      sessionStorage.setItem("admin_authenticated", "true");
+      setLoginPasswordInput("");
+      setLoginError("");
+    } else {
+      setLoginError("Senha incorreta. Por favor, tente novamente.");
+    }
+  };
 
   // File upload processing to offline Base64 helper
   const handleFileSelect = (file: File) => {
@@ -687,7 +711,77 @@ export default function App() {
         
         {/* VIEW 1: ADVANCED PANEL (ADMINISTRATIVO) */}
         {isAdminOpen ? (
-          <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden animate-fade-in">
+          !isAdminLoggedIn ? (
+            /* Secure Admin login shield */
+            <div className="max-w-md mx-auto my-12 bg-white dark:bg-stone-900 rounded-2xl shadow-xl border border-stone-200 dark:border-stone-800 overflow-hidden animate-fade-in">
+              <div className="bg-stone-950 px-6 py-8 text-white text-center border-b border-stone-800">
+                <div className="mx-auto bg-rose-600 w-12 h-12 rounded-full flex items-center justify-center mb-3 text-white">
+                  <ShieldCheck className="w-7 h-7" />
+                </div>
+                <h1 className="text-lg font-display font-black uppercase tracking-tight">
+                  Painel de Acesso Restrito
+                </h1>
+                <p className="text-xs text-stone-400">Identificação de Segurança Obrigatória</p>
+              </div>
+
+              <form onSubmit={handleAdminLogin} className="p-6 space-y-4">
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 dark:text-stone-300 uppercase mb-1">Introduza a Senha de Acesso</label>
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      value={loginPasswordInput}
+                      onChange={(e) => {
+                        setLoginPasswordInput(e.target.value);
+                        setLoginError("");
+                      }}
+                      placeholder="••••••••"
+                      className="w-full border border-gray-200 dark:border-stone-800 p-2.5 rounded-lg text-sm bg-white dark:bg-stone-950 text-stone-900 dark:text-white pr-10 focus:outline-none focus:ring-2 focus:ring-rose-500 font-mono"
+                      autoFocus
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-3 text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 cursor-pointer"
+                    >
+                      <Eye className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+
+                {loginError && (
+                  <p className="text-xs text-red-600 font-bold bg-red-50 dark:bg-red-950/20 p-2.5 rounded-lg border border-red-200 dark:border-red-900/40 font-mono">
+                    ⚠️ {loginError}
+                  </p>
+                )}
+
+                <button
+                  type="submit"
+                  className="w-full py-2.5 bg-rose-600 hover:bg-rose-700 active:scale-95 text-white text-xs font-black uppercase rounded-lg shadow-md transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                >
+                  <ShieldCheck className="w-4 h-4" />
+                  <span>Entrar no Painel</span>
+                </button>
+
+                <div className="pt-2 text-center">
+                  <button
+                    type="button"
+                    onClick={() => setIsAdminOpen(false)}
+                    className="text-[11px] text-stone-500 hover:text-stone-700 dark:hover:text-stone-300 font-bold underline cursor-pointer"
+                  >
+                    Voltar ao Portal do Leitor
+                  </button>
+                </div>
+
+                <div className="mt-4 pt-4 border-t border-stone-150 dark:border-stone-800 text-center">
+                  <span className="inline-block px-3 py-1 bg-amber-50 dark:bg-amber-950/30 text-amber-800 dark:text-amber-400 text-[10px] font-black uppercase tracking-wider rounded border border-amber-200/50">
+                    Dica: A senha inicial é "admin123"
+                  </span>
+                </div>
+              </form>
+            </div>
+          ) : (
+            <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden animate-fade-in">
             {/* Header dashboard layout */}
             <div className="bg-gray-950 px-6 py-5 text-white flex flex-col sm:flex-row items-center justify-between border-b border-gray-800">
               <div className="flex items-center space-x-3 mb-4 sm:mb-0">
@@ -703,16 +797,33 @@ export default function App() {
               </div>
 
               {/* Action close button */}
-              <button 
-                onClick={() => {
-                  setIsAdminOpen(false);
-                  fetchInitialData();
-                }} 
-                className="px-4 py-2 bg-rose-600 text-white hover:bg-rose-700 font-bold text-xs uppercase cursor-pointer rounded-lg flex items-center space-x-1 transition-all"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                <span>Sair do Painel</span>
-              </button>
+              <div className="flex flex-wrap items-center gap-2">
+                <button 
+                  onClick={() => {
+                    setIsAdminOpen(false);
+                    fetchInitialData();
+                  }} 
+                  className="px-3 py-2 bg-stone-800 text-stone-200 hover:bg-stone-750 hover:text-white font-bold text-xs uppercase cursor-pointer rounded-lg flex items-center space-x-1 transition-all"
+                  title="Voltar ao portal mantendo a sessão iniciada"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                  <span>Voltar ao Portal</span>
+                </button>
+
+                <button 
+                  onClick={() => {
+                    setIsAdminLoggedIn(false);
+                    sessionStorage.removeItem("admin_authenticated");
+                    setIsAdminOpen(false);
+                    fetchInitialData();
+                  }} 
+                  className="px-3 py-2 bg-rose-600 text-white hover:bg-rose-750 font-bold text-xs uppercase cursor-pointer rounded-lg flex items-center space-x-1 transition-all shadow active:scale-95"
+                  title="Terminar sessão administrativa com segurança"
+                >
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  <span>🔒 Bloquear / Logout</span>
+                </button>
+              </div>
             </div>
 
             {/* Navigation Tabs and Layout Grid options */}
@@ -1946,6 +2057,28 @@ export default function App() {
                       </div>
 
                       <div className="space-y-4 bg-stone-50 p-5 rounded-lg border border-stone-200">
+                        {/* 🔒 SEGURANÇA: CONTROLO DE SENHA ADM */}
+                        <div className="pb-4 mb-4 border-b border-stone-300/60">
+                          <h4 className="text-xs font-black uppercase text-gray-900 tracking-wider flex items-center gap-1.5">
+                            🔒 Senha do Painel (ADM)
+                          </h4>
+                          <p className="text-[10px] text-stone-600 mt-1 leading-normal">
+                            Altere a senha de proteção do painel de administração. O novo valor será persistido localmente de forma segura.
+                          </p>
+                          <div className="relative mt-2">
+                            <input
+                              type="text"
+                              value={adminPassword}
+                              onChange={(e) => {
+                                setAdminPassword(e.target.value);
+                                localStorage.setItem("admin_portal_password", e.target.value);
+                              }}
+                              placeholder="admin123"
+                              className="w-full border border-stone-200 p-2 rounded text-xs bg-white text-stone-950 font-mono focus:outline-none focus:ring-1 focus:ring-rose-500"
+                            />
+                          </div>
+                        </div>
+
                         <h4 className="text-xs font-black uppercase text-gray-900 tracking-wider">Estado da Segurança do Servidor</h4>
                         <div className="space-y-3 mt-4 text-xs">
                           <div className="flex justify-between border-b border-stone-200 pb-2">
@@ -2027,6 +2160,7 @@ export default function App() {
               </div>
             </div>
           </div>
+          )
         ) : activePage ? (
           
           /* VIEW 2: INSTITUTIONAL & POLICY LEGAL PAGES */
