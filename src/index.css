@@ -1,0 +1,112 @@
+@import url('https://fonts.googleapis.com/css2?family=Georgia:ital,wght@0,400;0,700;0,900;1,400&family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Georgia", Cambria, "Times New Roman", Times, serif;
+  --font-display: "Space Grotesk", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+:root {
+  --ink: #111111;
+  --paper: #ffffff;
+  --accent: #d91e18;
+  --line: #e2e8f0;
+}
+
+/* Custom smooth scrolling and focus rings */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--paper);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Base custom styles mimicking glassmorphism and subtle cards */
+.custom-shadow {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+}
+
+.custom-shadow-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+}
+
+/* Dark mode theme variables */
+.dark {
+  --ink: #f5f5f4; /* stone-100 */
+  --paper: #0c0a09; /* stone-950 */
+  --line: #292524; /* stone-800 */
+}
+
+/* Global Dark mode styling overrides for perfect contrast and look-and-feel */
+.dark body, 
+.dark .bg-slate-50, 
+.dark .bg-gray-50, 
+.dark .bg-stone-50,
+.dark .bg-\[\#fafafa\] {
+  background-color: #0c0a09 !important; /* stone-950 */
+}
+
+.dark .bg-white,
+.dark .bg-white\/95 {
+  background-color: #1c1917 !important; /* stone-900 */
+}
+
+.dark .text-gray-900,
+.dark .text-gray-950,
+.dark .text-stone-900,
+.dark .text-stone-950 {
+  color: #f5f5f4 !important; /* stone-100 */
+}
+
+.dark .text-gray-800,
+.dark .text-stone-800 {
+  color: #e7e5e4 !important; /* stone-200 */
+}
+
+.dark .text-gray-700,
+.dark .text-stone-700 {
+  color: #d6d3d1 !important; /* stone-300 */
+}
+
+.dark .text-gray-600,
+.dark .text-stone-600,
+.dark .text-gray-500,
+.dark .text-stone-500 {
+  color: #a8a29e !important; /* stone-400 */
+}
+
+.dark .border-gray-100,
+.dark .border-stone-100,
+.dark .border-gray-200,
+.dark .border-stone-200 {
+  border-color: #292524 !important; /* stone-800 */
+}
+
+.dark input, 
+.dark textarea, 
+.dark select {
+  background-color: #1c1917 !important;
+  color: #f5f5f4 !important;
+  border-color: #44403c !important; /* stone-700 */
+}
+
+.dark input::placeholder, 
+.dark textarea::placeholder {
+  color: #78716c !important; /* stone-500 */
+}
+
+/* Scrollbar styling */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+

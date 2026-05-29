@@ -1,0 +1,6 @@
+{
+  "name": "Portal de Notícias Moderno",
+  "description": "Um portal de notícias moderno, responsivo e escalável com painel de controlo administrativo avançado e integração de IA para geração de títulos virais.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
